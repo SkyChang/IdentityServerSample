@@ -82,8 +82,37 @@ namespace IdentityServerSample.Service
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile
                     }
+                },
+
+                // Hybrid Flow , 使用 OIDC + OAUTH,
+                // 通常使用在 Client 為 Web , 並且需要 Web ( backend ) call backend service 的情境
+                // 主要是先透過 OIDC 取得身分驗證後，在一次的交換需要的 Token ( OAUTH - Server 2 Server 用 )
+                new Client
+                {
+                    ClientId = "mvc2",
+                    ClientName = "MVC Client",
+                    AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
+
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+
+                    RedirectUris           = { "https://localhost:7001/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:7001/signout-callback-oidc" },
+
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "api1"
+                    },
+                    // 我們還讓 Client 允許 offline_access - 這允許請求刷新令牌以實現長期 API 訪問
+                    AllowOfflineAccess = true
                 }
-            };
+
+
+        };
         }
 
         /// <summary>
